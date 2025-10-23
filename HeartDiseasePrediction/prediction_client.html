@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Heart Disease Predictor</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-group input, .input-group select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #aaa; }
+        button { padding: 10px 15px; background-color: #3498db; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #2980b9; }
+        #resultBox { padding: 20px; margin-top: 20px; border: 2px solid; display: none; }
+        #loadingIndicator { color: #3498db; font-style: italic; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header style="text-align: center; margin-bottom: 20px;">
+            <h1>Heart Disease Predictor</h1>
+        </header>
+
+        <form id="predictionForm">
+
+            <!-- 1. AGE -->
+            <div class="input-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" name="age" min="18" max="100" placeholder="e.g., 55" required>
+            </div>
+            
+            <!-- 2. SEX -->
+            <div class="input-group">
+                <label for="sex">Sex</label>
+                <select id="sex" name="sex" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                </select>
+            </div>
+
+            <!-- 3. CP (Chest Pain Type) -->
+            <div class="input-group">
+                <label for="cp">Chest Pain Type (CP)</label>
+                <select id="cp" name="cp" required>
+                    <option value="" disabled selected>Select CP Type</option>
+                    <option value="typical angina">Typical Angina</option>
+                    <option value="atypical angina">Atypical Angina</option>
+                    <option value="non-anginal">Non-anginal Pain</option>
+                    <option value="asymptomatic">Asymptomatic</option>
+                </select>
+            </div>
+
+            <!-- 4. TRESTBPS (Resting Blood Pressure) -->
+            <div class="input-group">
+                <label for="trestbps">Resting BP (mm Hg)</label>
+                <input type="number" id="trestbps" name="trestbps" min="80" max="200" placeholder="e.g., 130" required>
+            </div>
+
+            <!-- 5. CHOL (Cholesterol) -->
+            <div class="input-group">
+                <label for="chol">Serum Chol. (mg/dl)</label>
+                <input type="number" id="chol" name="chol" min="100" max="600" placeholder="e.g., 240" required>
+            </div>
+
+            <!-- 6. THALCH (Max Heart Rate) -->
+            <div class="input-group">
+                <label for="thalch">Max HR Achieved</label>
+                <input type="number" id="thalch" name="thalch" min="70" max="220" placeholder="e.g., 150" required>
+            </div>
+
+            <!-- 7. FBS (Fasting Blood Sugar) -->
+            <div class="input-group">
+                <label for="fbs">Fasting Blood Sugar > 120 mg/dl?</label>
+                <select id="fbs" name="fbs" required>
+                    <option value="True">Yes</option>
+                    <option value="False" selected>No</option>
+                </select>
+            </div>
+
+            <!-- 8. EXANG (Exercise Induced Angina) -->
+            <div class="input-group">
+                <label for="exang">Exercise Induced Angina?</label>
+                <select id="exang" name="exang" required>
+                    <option value="True">Yes</option>
+                    <option value="False" selected>No</option>
+                </select>
+            </div>
+
+            <!-- 9. RESTECG (Resting ECG) -->
+            <div class="input-group">
+                <label for="restecg">Resting ECG Results</label>
+                <select id="restecg" name="restecg" required>
+                    <option value="" disabled selected>Select Result</option>
+                    <option value="normal">Normal</option>
+                    <option value="st-t abnormality">ST-T Abnormality</option>
+                    <option value="lv hypertrophy">LV Hypertrophy</option>
+                </select>
+            </div>
+
+            <!-- 10. OLDPEAK (ST depression induced by exercise) -->
+            <div class="input-group">
+                <label for="oldpeak">ST Depression (oldpeak)</label>
+                <input type="number" id="oldpeak" name="oldpeak" step="0.1" min="0" max="6.2" placeholder="e.g., 1.5" required>
+            </div>
+
+            <!-- 11. SLOPE (Slope of the peak exercise ST segment) -->
+            <div class="input-group">
+                <label for="slope">Peak Exercise ST Slope</label>
+                <select id="slope" name="slope" required>
+                    <option value="" disabled selected>Select Slope</option>
+                    <option value="upsloping">Upsloping</option>
+                    <option value="flat">Flat</option>
+                    <option value="downsloping">Downsloping</option>
+                </select>
+            </div>
+
+            <!-- 12. CA (Number of major vessels) -->
+            <div class="input-group">
+                <label for="ca">Num. Major Vessels (0-3)</label>
+                <input type="number" id="ca" name="ca" min="0" max="3" placeholder="e.g., 0" required>
+            </div>
+
+            <!-- 13. THAL (Thalassemia) -->
+            <div class="input-group">
+                <label for="thal">Thalassemia (THAL)</label>
+                <select id="thal" name="thal" required>
+                    <option value="" disabled selected>Select THAL Result</option>
+                    <option value="normal">Normal</option>
+                    <option value="fixed defect">Fixed Defect</option>
+                    <option value="reversable defect">Reversable Defect</option>
+                </select>
+            </div>
+            
+            <div class="input-group" style="text-align: center;">
+                <button type="submit" id="predictButton">
+                    Predict Heart Disease Risk
+                </button>
+                <div id="loadingIndicator" style="display: none;">Processing...</div>
+            </div>
+
+        </form>
+
+        <!-- Result Display -->
+        <div id="resultBox" style="display: none;">
+            <h2 id="predictionHeader" style="text-align: center;"></h2>
+            
+            <p><strong>Risk Status:</strong> <span id="riskIndicator"></span></p>
+
+            <p style="font-size: 0.8em; color: #666; text-align: center; margin-top: 15px;">
+                This is an ML prediction from a Python Flask server. Always consult a medical professional for diagnosis.
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        const form = document.getElementById('predictionForm');
+        const resultBox = document.getElementById('resultBox');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const riskIndicator = document.getElementById('riskIndicator');
+        const predictionHeader = document.getElementById('predictionHeader');
+        
+        //IMPORTANT: This URL must match where your Flask server is running
+        const PREDICT_API_URL = 'http://127.0.0.1:5000/predict'; 
+
+        function updateResultDisplay(predictionClass) {
+            
+            let riskText, headerText, borderColor, bgColor, textColor;
+            
+            if (predictionClass === 1) {
+                // Prediction: Heart Disease
+                riskText = "HIGH RISK (Predicted Disease)";
+                headerText = " Elevated Heart Disease Risk ";
+                borderColor = 'red';
+                bgColor = '#ffe0e0';
+                textColor = 'red';
+            } else {
+                // Prediction: No Heart Disease
+                riskText = "LOW RISK (Predicted Healthy)";
+                headerText = " Low Heart Disease Risk ";
+                borderColor = 'green';
+                bgColor = '#e0ffe0';
+                textColor = 'green';
+            }
+
+            // Set content
+            predictionHeader.textContent = headerText;
+            riskIndicator.textContent = riskText;
+
+            // Apply minimal inline styles for visibility
+            riskIndicator.style.color = textColor;
+            riskIndicator.style.fontWeight = 'bold';
+            
+            resultBox.style.borderColor = borderColor;
+            resultBox.style.backgroundColor = bgColor;
+            resultBox.style.display = 'block'; // Show the box
+        }
+
+        /**
+         * Main prediction handler using the Flask API.
+         */
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            loadingIndicator.style.display = 'block';
+            resultBox.style.display = 'none';
+
+            // 1. Extract raw user data and format for JSON
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Convert boolean-like strings to actual booleans for Python
+            data.fbs = data.fbs === 'True';
+            data.exang = data.exang === 'True';
+            data.age = parseInt(data.age);
+            data.trestbps = parseInt(data.trestbps);
+            data.chol = parseInt(data.chol);
+            data.thalch = parseInt(data.thalch);
+            data.oldpeak = parseFloat(data.oldpeak);
+            data.ca = parseFloat(data.ca);
+
+            try {
+                // 2. Send data to the Flask API
+                const response = await fetch(PREDICT_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    console.error("Server Error:", result.error);
+                    // Handle error display
+                    predictionHeader.textContent = "Error: Prediction failed.";
+                    riskIndicator.textContent = result.error;
+                    resultBox.style.display = 'block';
+                    resultBox.style.borderColor = 'red';
+                    resultBox.style.backgroundColor = '#ffe0e0';
+                    return;
+                }
+
+                // 3. Update UI with server results (only using 'prediction')
+                const predictionClass = result.prediction;
+
+                updateResultDisplay(predictionClass);
+                
+            } catch (error) {
+                console.error("Fetch/Network Error:", error);
+                // Handle network error display
+                predictionHeader.textContent = "Network Error: Could not connect to server.";
+                riskIndicator.textContent = "Ensure 'app.py' is running locally on port 5000.";
+                resultBox.style.display = 'block';
+                resultBox.style.borderColor = 'orange';
+                resultBox.style.backgroundColor = '#fff8e0';
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+</html>
